@@ -41,9 +41,19 @@ describe "Protobuf::Message" do
     msg = TestMessagesProto3::Test4.new
     msg.d = [ 3,270, 86942]
     str = msg_to_protobuf_hexstring msg
-
     str.should eq "2206038e029ea705"
   end
+
+  it "empty repeated (packed) should not be written" do
+    msg = TestMessagesProto3::Test4.new
+    msg.d = [] of Int32
+
+    some_io = IO::Memory.new
+    msg.to_protobuf some_io
+
+    some_io.size.should eq 0
+  end
+
 end
 
 # Proto2

@@ -61,6 +61,10 @@ module Protobuf
         {% end %}
         loop do
           tag_id, wire = buf.read_info
+
+          # tag_id > 0 , max 32-3 bits
+          raise "invalid tag_id" unless tag_id.nil? || tag_id > 0
+
           case tag_id
           {% for tag, field in FIELDS %}
           when {{tag}}
@@ -156,7 +160,8 @@ module Protobuf
         buf = Protobuf::Buffer.new(io)
         {% for tag, field in FIELDS %}
           %val{tag} = @{{field[:name].id}}
-          %is_enum{tag} = %val{tag}.is_a?(Enum) || %val{tag}.is_a?(Array) && %val{tag}.first.is_a?(Enum)
+
+          %is_enum{tag} = %val{tag}.is_a?(Enum) || %val{tag}.is_a?(Array) && %val{tag}.size > 0 && %val{tag}.first.is_a?(Enum)
           %wire{tag} = Protobuf::WIRE_TYPES.fetch({{field[:pb_type]}}, %is_enum{tag} ? 0 : 2)
           {%
             pb_type = Protobuf::PB_TYPE_MAP[field[:pb_type]]
@@ -166,6 +171,10 @@ module Protobuf
             if !@{{field[:name].id}}.nil?
               {% if field[:repeated] %}
                 {% if pbVer != "proto2" || field[:packed] %}
+
+                  # per docs: A packed repeated field containing zero elements does not appear in the encoded message.
+                  return if %val{tag}.not_nil!.size == 0
+
                   buf.write_info({{tag}}, 2)
                   buf.write_packed(@{{field[:name].id}}, {{field[:pb_type]}})
                 {% else %}
