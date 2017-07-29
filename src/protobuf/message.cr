@@ -216,8 +216,16 @@ module Protobuf
       def to_json(json : JSON::Builder)
         json.object do
           {% for tag, field in FIELDS %}
-            json.field {{field[:name].id.stringify}} do
-               @{{field[:name].id}}.to_json(json)
+            unless @{{field[:name].id}}.nil?
+              json.field {{field[:name].id.stringify}} do
+                {% if field[:pb_type] == :bytes %}
+                  bytes_to_json({{field[:name].id.stringify}}, {{field[:name].id}}.not_nil!, json)
+                {% else %}
+
+                  {{field[:name].id}}.to_json(json)
+
+                {% end %}
+              end
             end
           {% end %}
         end
@@ -233,6 +241,10 @@ module Protobuf
     def ==(other : Protobuf::Message)
       self.class == other.class &&
         to_protobuf.to_slice == other.to_protobuf.to_slice
+    end
+
+    def bytes_to_json(fieldName : String, value : Bytes, json : JSON::Builder)
+      json.string(value.hexstring)
     end
   end
 end

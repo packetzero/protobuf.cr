@@ -54,13 +54,21 @@ describe "Protobuf::Message" do
     some_io.size.should eq 0
   end
 
-  it "to_json works" do
+  it "to_json works with nested objects" do
     msg1 = TestMessagesProto3::Test1.new
     msg1.a=150
     msg = TestMessagesProto3::Test3.new
     msg.c=msg1
     str = msg.to_json
     str.should eq "{\"c\":{\"a\":150}}"
+  end
+
+  it "to_json works with slices" do
+    msg = TestMessagesProto3::Test5.new
+    msg.name="host"
+    msg.ipaddr="40ae9300".hexbytes
+    str = msg.to_json
+    str.should eq "{\"ipaddr\":\"40ae9300\",\"name\":\"host\"}"
   end
 
 
