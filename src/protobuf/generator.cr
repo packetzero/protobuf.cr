@@ -257,6 +257,9 @@ module Protobuf
           message_type.field.not_nil!.each { |f| field!(f) } unless message_type.field.nil?
         end
         puts "end"
+
+        isJsonEnabled = ENV.fetch("PROTOBUF_TO_JSON") || "false"
+        puts "with_to_json" if isJsonEnabled == "true"
       end
       puts "end"
     end

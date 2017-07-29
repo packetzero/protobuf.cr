@@ -1,3 +1,5 @@
+require "json"
+
 module Protobuf
   module Message
     macro contract
@@ -197,6 +199,25 @@ module Protobuf
           {% end %}
         {% end %}
         io
+      end
+    end
+
+    macro with_to_json
+      def to_json
+          String.build do |str|
+          to_json str
+          end
+      end
+      def to_json(io : IO)
+        JSON.build(io) do |json|
+          json.object do
+            {% for tag, field in FIELDS %}
+              json.field {{field[:name].id.stringify}} do
+                 @{{field[:name].id}}.to_json(json)
+              end
+            {% end %}
+          end
+        end
       end
     end
 
