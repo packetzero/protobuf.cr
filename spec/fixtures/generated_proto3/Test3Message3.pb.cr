@@ -9,5 +9,7 @@ module TestMessagesProto3
     contract_of "proto3" do
       optional :c, Test1, 3
     end
+
+    with_to_json
   end
 end

@@ -9,6 +9,7 @@ module TestMessagesProto3
     contract_of "proto3" do
       optional :a, :int32, 1
     end
+    with_to_json
   end
 
 end

@@ -204,19 +204,22 @@ module Protobuf
 
     macro with_to_json
       def to_json
-          String.build do |str|
+        String.build do |str|
           to_json str
-          end
+        end
       end
       def to_json(io : IO)
         JSON.build(io) do |json|
-          json.object do
-            {% for tag, field in FIELDS %}
-              json.field {{field[:name].id.stringify}} do
-                 @{{field[:name].id}}.to_json(json)
-              end
-            {% end %}
-          end
+          to_json json
+        end
+      end
+      def to_json(json : JSON::Builder)
+        json.object do
+          {% for tag, field in FIELDS %}
+            json.field {{field[:name].id.stringify}} do
+               @{{field[:name].id}}.to_json(json)
+            end
+          {% end %}
         end
       end
     end

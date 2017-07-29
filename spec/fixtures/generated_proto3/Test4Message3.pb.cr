@@ -9,6 +9,8 @@ module TestMessagesProto3
     contract_of "proto3" do
       repeated :d, :int32, 4
     end
+
+    with_to_json
   end
 
 end
