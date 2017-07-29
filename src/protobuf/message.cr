@@ -219,10 +219,10 @@ module Protobuf
             unless @{{field[:name].id}}.nil?
               json.field {{field[:name].id.stringify}} do
                 {% if field[:pb_type] == :bytes %}
-                  bytes_to_json({{field[:name].id.stringify}}, {{field[:name].id}}.not_nil!, json)
+                  bytes_to_json({{field[:name].id.stringify}}, @{{field[:name].id}}.not_nil!, json)
                 {% else %}
 
-                  {{field[:name].id}}.to_json(json)
+                  @{{field[:name].id}}.to_json(json)
 
                 {% end %}
               end
