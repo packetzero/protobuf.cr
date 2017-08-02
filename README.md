@@ -1,6 +1,6 @@
 # protobuf [![Build Status](https://travis-ci.org/jeromegn/protobuf.cr.svg?branch=master)](https://travis-ci.org/jeromegn/protobuf.cr) [![Dependency Status](https://shards.rocks/badge/github/jeromegn/protobuf.cr/status.svg)](https://shards.rocks/github/jeromegn/protobuf.cr) [![devDependency Status](https://shards.rocks/badge/github/jeromegn/protobuf.cr/dev_status.svg)](https://shards.rocks/github/jeromegn/protobuf.cr)
 
-Crystal shard to decode, encode and generate protobuf messages.
+Crystal shard to decode, encode and generate protobuf messages. 
 
 ## Installation
 
