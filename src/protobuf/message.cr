@@ -188,6 +188,53 @@ module Protobuf
       end
     end
 
+    macro with_to_json
+      def to_json
+        String.build do |str|
+          to_json str
+        end
+      end
+      def to_json(io : IO)
+        JSON.build(io) do |json|
+          to_json json
+        end
+      end
+      def to_json(json : JSON::Builder)
+        json.object do
+          {% for tag, field in FIELDS %}
+            unless @{{field[:name].id}}.nil?
+              json.field {{field[:name].id.stringify}} do
+
+                {% if field[:repeated] %}
+                  json.start_array
+                  @{{field[:name].id}}.not_nil!.each { |item|
+                    {% if field[:pb_type] == :bytes %}
+                      bytes_to_json({{field[:name].id.stringify}}, item.not_nil!, json)
+                    {% else %}
+                      json.raw item.to_json
+                    {% end %}
+                  }
+                  json.end_array
+                {% elsif field[:pb_type] == :bytes %}
+
+                  bytes_to_json({{field[:name].id.stringify}}, @{{field[:name].id}}.not_nil!, json)
+
+                {% elsif field[:crystal_type].is_a? Enum %}
+
+                  json.raw @{{field[:name].id}}.to_s
+
+                {% else %}
+
+                    json.raw @{{field[:name].id}}.to_json
+
+                {% end %}
+              end
+            end
+          {% end %}
+        end
+      end
+    end
+
     macro _generate_getters_setters
       {% for tag, field in FIELDS %}
         property {{field[:name].id}} : {{field[:cast_type]}}
@@ -197,6 +244,10 @@ module Protobuf
     def ==(other : Protobuf::Message)
       self.class == other.class &&
         to_protobuf.to_slice == other.to_protobuf.to_slice
+    end
+
+    def bytes_to_json(fieldName : String, value : Bytes, json : JSON::Builder)
+      json.string(value.hexstring)
     end
   end
 end
